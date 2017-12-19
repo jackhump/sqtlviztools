@@ -69,7 +69,13 @@ make_sQTL_cluster_plot <- function(
   cryptic_colour <- "pink"
   SNP_colour <- "goldenrod"
   # convert colnames(y) into intron meta data
-  intron_meta <- get_intron_meta(colnames(y))
+  #message("cluster to plot is:")
+  #message(cluster_to_plot)
+  #message("go fuck off a bridge")
+  #print(head(colnames(y)))
+  intron_meta <- leafcutter::get_intron_meta(colnames(y))
+
+  message( head(intron_meta))
 
   #intron_meta$verdict <- introns_to_plot$verdict[match(paste(intron_meta$start,intron_meta$end), paste(introns_to_plot$start, introns_to_plot$end) ) ]
   intron_meta$verdict <- introns_to_plot$verdict[

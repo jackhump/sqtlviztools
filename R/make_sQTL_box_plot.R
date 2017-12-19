@@ -75,30 +75,30 @@ make_sQTL_box_plot <- function(
   )
 
   #print(group_names)
-  #message("BOYYYYYY")
+  message("BOYYYYYY")
   y <- t(counts[ cluster_ids==cluster_to_plot, ])
-  #message("HELLO BOY")
   # for each sample divide each junction count by the total for that sample
   normalisedCounts <- as.data.frame(sweep(y, 1, rowSums(y), "/"))
-
+  message("HELLO BOY")
   genotypes <- as.data.frame(t(VCF))
   names(genotypes)[1] <- "geno"
-  #message("WHEEWWWW LADDDY")
+  message("WHEEWWWW LADDDY")
   normalisedCounts$genotypeCode <- genotypes$geno[ match( row.names(normalisedCounts), row.names(genotypes))]
   normalisedCounts <- normalisedCounts[ complete.cases(normalisedCounts),]
 
   normalisedCounts$genotype <- names(group_names)[ match(normalisedCounts$genotypeCode, group_names)]
 
   print(head(normalisedCounts))
-  #message("GREAT TO MEET YOU")
+  message("GREAT TO MEET YOU")
 
   toPlot <- dplyr::select( normalisedCounts,
                     junction = junction_to_plot,
                     geno =  "genotype")
-  #message("I AM BEAT")
+
+  message("I AM BEAT")
   toPlot$geno <- factor(toPlot$geno, levels = (names(group_names))) # this was reversed
 
-  #message("HELLO AGAIN LADDY")
+  message("HELLO AGAIN LADDY")
 
   # get junction information for title
   junc <- dplyr::mutate(junctionTable,

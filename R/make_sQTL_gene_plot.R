@@ -51,6 +51,12 @@ make_gene_plot <- function(gene_name,
 
   stopifnot( !is.null(exons_table) )
   stopifnot( !is.null(introns_to_plot))
+
+  # if no gene name annotated to junctions then return NULL
+  if( gene_name == "."){
+    return(NULL)
+  }
+
   # only get the exons of the gene of interest - no overlapping genes!
   exons <- exons_table[ exons_table$gene_name == gene_name, ]
 

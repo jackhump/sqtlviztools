@@ -69,7 +69,21 @@ intersect_introns <- function(introns){
   return( list(threeprime_intersect, fiveprime_intersect,all.introns_intersect))
 }
 
-annotate_single_cluster <- function(introns, clu, cluIndex){
+#' Title
+#'
+#' @param introns
+#' @param clu
+#' @param cluIndex
+#' @param fiveprime
+#' @param threeprime
+#' @param bothSS
+#'
+#' @return
+#' @export
+#' @import data.table
+#'
+#' @examples
+annotate_single_cluster <- function(introns, clu, cluIndex, fiveprime, threeprime, bothSS){
   #print(clu)
   # for each intron in the cluster, check for coverage of both
   # output a vector of string descriptions
@@ -77,9 +91,14 @@ annotate_single_cluster <- function(introns, clu, cluIndex){
   cluster$start <- as.integer(cluster$start)
   cluster$end <- as.integer(cluster$end)
   # subset intersects by clusterID (V4)
-  fprimeClu <- fiveprime_intersect[ V4 == clu,]
-  tprimeClu <- threeprime_intersect[ V4 == clu,]
-  bothSSClu <- all.introns_intersect[ V4 == clu,]
+  # data.table method not working for some reason
+  ## fprimeClu <- fiveprime[ V4 == clu,]
+  # tprimeClu <- threeprime[ V4 == clu,]
+  # bothSSClu <- bothSS[ V4 == clu,]
+  fprimeClu <- dplyr::filter( fiveprime, V4 == clu)
+  tprimeClu <- dplyr::filter( threeprime, V4 == clu)
+  bothSSClu <- dplyr::filter( bothSS, V4 == clu)
+
   # for each intron in the cluster:
   #   create vector of overlapping splice sites, indexed by the row of the intersect
   # five prime splice sites
@@ -94,18 +113,16 @@ annotate_single_cluster <- function(introns, clu, cluIndex){
     fprime <- apply( cluster, MAR = 1, FUN = function(x) {
       chr <- which( names(cluster) == "chr" )
       start <- which( names(cluster) == "start" )
-      fprimeClu[
-        V1 == x[chr] &
-          V2 == as.numeric( x[start] ),]
+      #fprimeClu[ V1 == x[chr] & V2 == as.numeric( x[start] ),]
+      dplyr::filter(fprimeClu, V1 == x[chr] & V2 == as.numeric(x [ start]) )
     } )
 
     # three prime splice sites
     tprime <- apply( cluster, MAR = 1, FUN = function(x) {
       chr <- which( names(cluster) == "chr" )
       end <- which( names(cluster) == "end" )
-      tprimeClu[
-        V1 == x[chr] &
-          V2 == as.numeric( x[end] ),]
+      #tprimeClu[V1 == x[chr] & V2 == as.numeric( x[end] ),]
+      dplyr::filter(tprimeClu, V1 == x[chr] & V2 == as.numeric(x [end]) )
     } )
 
     # both splice sites
@@ -114,9 +131,10 @@ annotate_single_cluster <- function(introns, clu, cluIndex){
       start <- which(names(cluster) == "start")
       end <- which( names(cluster) == "end" )
 
-      bothSSClu[
-        V6 == as.numeric( x[start] ) &
-          V7 == as.numeric( x[end] ) ,]
+      # bothSSClu[
+      #   V6 == as.numeric( x[start] ) &
+      #     V7 == as.numeric( x[end] ) ,]
+      dplyr::filter(bothSSClu, V6 == as.numeric(x[start]) & V7 == as.numeric(x[end]))
     } )
     # find gene and ensemblID by the most represented gene among all the splice sites
     cluster_genes <- names(sort(table(do.call( what = rbind, c(tprime, fprime, bothSS)  )$V8), decreasing = TRUE ))
