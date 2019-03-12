@@ -66,7 +66,7 @@ make_gene_plot <- function(gene_name,
   stopifnot( length( unique(exons$chr) ) == 1 )
 
   # if introns_to_plot doesn't have the "chr" in front of chromosome names
-  if( all(grepl("chr", sample(introns_to_plot$chr, 100) )) ){ # if all introns to plot chromosomes have "chr"
+  if( all(grepl("chr", sample(introns_to_plot$chr, 100, replace = TRUE) )) ){ # if all introns to plot chromosomes have "chr"
     myChr <- unique(exons$chr)
   }else{
     myChr <- gsub( "chr", "", unique(exons$chr) ) # remove the "chr"
