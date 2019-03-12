@@ -35,7 +35,7 @@ permutation_full_res <- "example/example_permutations.full.0.05.bh.txt"
 
 # annotation - created by Leafcutter
 
-annotation_code <- "example/gencode_hg19"
+annotation_code <- "example/PTK2B_gencode_hg19"
 exon_file <- paste0(annotation_code, "_all_exons.txt.gz")
 all_introns <- paste0(annotation_code,"_all_introns.bed.gz" )
 threeprime_file <- paste0( annotation_code,"_threeprime.bed.gz")
