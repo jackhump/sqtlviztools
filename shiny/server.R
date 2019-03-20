@@ -16,7 +16,7 @@ library(stringr)
 #devtools::install_github("jackhump/sqtlviztools")
 library(sqtlviztools)
 
-if (!exists("introns")){
+if (!exists("vcf")){
   #setwd("~/Documents/sQTLviz/")
   load("sQTL_results.Rdata")
   defaultValue <- 1
