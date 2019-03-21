@@ -19,5 +19,4 @@ print(paste0("Loading results from ",results_filename))
 load(results_filename)
 
 
-options(max.print=100)
 shiny::runApp(launch.browser=TRUE)

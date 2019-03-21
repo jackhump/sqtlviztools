@@ -19,7 +19,9 @@ library(sqtlviztools)
 #if (!exists("introns")){
 #  #setwd("~/Documents/sQTLviz/")
 #  load("sQTL_results.Rdata")
-  defaultValue <- 1
+ 
+defaultValue <- 1
+
 #}else{
 #  defaultValue <- NULL
 #}

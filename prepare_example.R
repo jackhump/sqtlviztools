@@ -216,10 +216,14 @@ splitClusters <- introns_to_plot %>%
   purrr::map_df( juncProp ) %>%
   mutate( clu = as.character(.$clu))
 
-introns_to_plot <- introns_to_plot[ splitClusters$prop >= 0.01,]
-clusters <- clusters[ splitClusters$prop >= 0.01,]
-introns <- introns[ splitClusters$prop >= 0.01,]
+# thinning out clusters - turn off for now - this needs to be worked on
+thinClusters <- FALSE
 
+if( thinClusters == TRUE){
+  introns_to_plot <- introns_to_plot[ splitClusters$prop >= 0.01,]
+  clusters <- clusters[ splitClusters$prop >= 0.01,]
+  introns <- introns[ splitClusters$prop >= 0.01,]
+}
 ####################
 # ANNOTATE JUNCTIONS
 ####################
