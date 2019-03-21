@@ -16,13 +16,13 @@ library(stringr)
 #devtools::install_github("jackhump/sqtlviztools")
 library(sqtlviztools)
 
-if (!exists("introns")){
-  #setwd("~/Documents/sQTLviz/")
-  load("sQTL_results.Rdata")
+#if (!exists("introns")){
+#  #setwd("~/Documents/sQTLviz/")
+#  load("sQTL_results.Rdata")
   defaultValue <- 1
-}else{
-  defaultValue <- NULL
-}
+#}else{
+#  defaultValue <- NULL
+#}
 
 #source("sqtlviztools/R/make_sQTL_cluster_plot.R")
 # source("make_sQTL_gene_plot.R")
