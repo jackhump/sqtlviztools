@@ -53,17 +53,18 @@ intersect_introns <- function(introns){
 
   # first match junctions
   all.introns.cmd <- paste0("bedtools intersect -a ", all.file, " -b ", all_introns, " -wa -wb -loj -f 1" )
-  all.introns_intersect <- data.table::fread(all.introns.cmd)
+  all.introns_intersect <- data.table::fread(cmd = all.introns.cmd, header=FALSE)
 
   # intersect with bedtools to find the annotations of each splice site
   threeprime.cmd <- paste0( "bedtools intersect -a ", all.threeprime.file, " -b ",threeprime_file, " -wa -wb -loj -f 1" )
-  threeprime_intersect <- data.table::fread(threeprime.cmd)
+  threeprime_intersect <- data.table::fread(cmd = threeprime.cmd,header=FALSE)
 
   fiveprime.cmd <- paste0( "bedtools intersect -a ", all.fiveprime.file, " -b ", fiveprime_file, " -wa -wb -loj -f 1" )
-  fiveprime_intersect <- data.table::fread(fiveprime.cmd)
+  fiveprime_intersect <- data.table::fread(cmd = fiveprime.cmd,header=FALSE)
 
   # remove temporary files
   rm.cmd <- paste("rm ", all.file, all.fiveprime.file, all.threeprime.file)
+  
   system(rm.cmd)
 
   return( list(threeprime_intersect, fiveprime_intersect,all.introns_intersect))

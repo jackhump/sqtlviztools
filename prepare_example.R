@@ -8,7 +8,7 @@ library(readr)
 
 library(sqtlviztools)
 
-
+options(echo=TRUE)
 
 # make example files
 #rs4733060	8:27302432	PTK2B	chr8:27308412-27309002
@@ -43,7 +43,7 @@ fiveprime_file <- paste0( annotation_code,"_fiveprime.bed.gz")
 
 exons_table <- if (!is.null( exon_file )) {
   cat("Loading exons from",exon_file,"\n")
-  as.data.frame(fread(paste("zless",exon_file)) )
+  as.data.frame(fread(cmd = paste("zless",exon_file)) )
 } else {
   cat("No exon_file provided.\n")
   NULL
@@ -244,6 +244,10 @@ uniqueClusters <- unique( introns$clu )
 #load(file="~/Documents/sQTLviz/annotation_test.Rdata")
 #annotate_single_cluster(introns, clu = uniqueClusters[1], cluIndex=1)
 
+# for debugging
+
+save.image("debug.RData")
+
 annotatedClusters <- purrr::map_df( seq_along(uniqueClusters),
                                     ~annotate_single_cluster( introns,
                                                               clu = uniqueClusters[.],
@@ -353,7 +357,7 @@ resultsToPlot$q <- signif(resultsToPlot$q,  digits = 3)
 #                          col_types = "ccinn",
 #                          delim = " "
 # )
-perm_full <- fread(paste("zless", permutation_full_res), data.table=FALSE)
+perm_full <- fread(cmd = paste("zless", permutation_full_res), data.table=FALSE)
 names(perm_full) <- c("clusterID", "SNP","X","FDR", "Beta")
 
 junctionsNeeded <- introns_to_plot %>%
