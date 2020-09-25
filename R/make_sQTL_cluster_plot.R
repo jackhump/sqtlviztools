@@ -1,4 +1,3 @@
-#
 # cluster_to_plot = "clu_34225"
 #                    main_title = "CAST"
 #                    vcf=vcf
@@ -73,7 +72,7 @@ make_sQTL_cluster_plot <- function(
   #message(cluster_to_plot)
   #message("go fuck off a bridge")
   #print(head(colnames(y)))
-  intron_meta <- leafcutter::get_intron_meta(colnames(y))
+  intron_meta <- leafviz::get_intron_meta(colnames(y))
 
   message( head(intron_meta))
 

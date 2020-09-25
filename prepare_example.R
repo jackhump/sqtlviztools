@@ -1,7 +1,7 @@
 library(dplyr)
 library(purrr)
 library(data.table)
-library(leafcutter)
+library(leafviz)
 library(stringr)
 library(readr)
 
@@ -188,7 +188,7 @@ sigClusters <- str_split_fixed(res[,1], ":",4)[,4]
 ### add Nalls' GWAS SNP clusters and Yang's too!
 #sigClusters <- c(sigClusters, gwas_clusters, yang_clusters)
 
-introns <- leafcutter::get_intron_meta(row.names(clusters) )
+introns <- leafviz::get_intron_meta(row.names(clusters) )
 keepClusters <- match(introns$clu,sigClusters)
 
 # remove non-significant (or non-GWAS SNP-associated) clusters

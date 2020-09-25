@@ -19,6 +19,7 @@ Imports:
     shinyjs,
     leafviz,
     reshape2,
+    optparse,
     gridExtra,
     intervals,
     foreach,

@@ -2,7 +2,7 @@ library(shiny)
 library(dplyr)
 library(ggplot2)
 library(DT)
-library(leafcutter)
+library(leafviz)
 library(reshape2)
 library(gridExtra)
 library(intervals) # needed for pretty strand arrow placement
@@ -28,7 +28,7 @@ defaultValue <- 1
 
 #source("sqtlviztools/R/make_sQTL_cluster_plot.R")
 # source("make_sQTL_gene_plot.R")
-# #source("/Users/Jack/google_drive/Work/PhD_Year_3/leafcutter/leafcutter/R/make_gene_plot.R")
+# #source("/Users/Jack/google_drive/Work/PhD_Year_3/leafviz/leafcutter/R/make_gene_plot.R")
 # source("make_sQTL_box_plot.R")
 # sel <- 5
 # junction_to_plot <- sigJunctions[ sigJunctions$clu == row.names(resultsToPlot)[sel], ]
@@ -47,7 +47,7 @@ defaultValue <- 1
 
 # current issue - SNP coord is 0 - how wide to make it?
 
-#source("/Users/Jack/google_drive/Work/PhD_Year_3/leafcutter/leafcutter/R/make_gene_plot.R")
+#source("/Users/Jack/google_drive/Work/PhD_Year_3/leafviz/leafcutter/R/make_gene_plot.R")
 #source("make_sQTL_gene_plot.R")
 # sel <- 2
 # make_gene_plot(resultsToPlot[sel,]$gene,
