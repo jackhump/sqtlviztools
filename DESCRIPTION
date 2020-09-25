@@ -17,7 +17,7 @@ Imports:
     DT,
     shinycssloaders,
     shinyjs,
-    leafcutter,
+    leafviz,
     reshape2,
     gridExtra,
     intervals,
@@ -26,3 +26,6 @@ Imports:
     gtable,
     ggrepel,
     ggbeeswarm
+    
+Remotes:
+    jackhump/leafviz
