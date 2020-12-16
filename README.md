@@ -2,6 +2,12 @@
 
 An R package and associated scripts for visualisation splicing quantitative trait loci (sQTLs).
 
+## Citing sQTLviztools
+
+If you use sQTLviztools in your work, please cite the following two papers:
+- https://www.nature.com/articles/s41588-018-0238-1
+- https://www.nature.com/articles/s41467-019-08912-9
+
 ## Installation
 
 1. clone the sqtlviztools repo
