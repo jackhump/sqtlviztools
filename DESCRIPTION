@@ -27,6 +27,5 @@ Imports:
     gtable,
     ggrepel,
     ggbeeswarm
-    
 Remotes:
     jackhump/leafviz
