@@ -26,7 +26,6 @@
 #' @export
 make_sQTL_box_plot <- function(
   cluster_to_plot,
-  all_junctions = NA,
   junction_to_plot = NA,
   main_title = NA,
   exons_table = NULL,
@@ -48,9 +47,9 @@ make_sQTL_box_plot <- function(
 
   # sometimes chr is missing
 
-  if( !grepl("^chr", junction_to_plot)){
-    junction_to_plot <- paste0("chr", junction_to_plot)
-  }
+  # if( !grepl("^chr", junction_to_plot)){
+  #   junction_to_plot <- paste0("chr", junction_to_plot)
+  # }
 
   # subset VCF and get genotype groups
   vcfIndex <- which( vcf_meta$SNP == snp)
@@ -67,6 +66,24 @@ make_sQTL_box_plot <- function(
   #message("YO")
   meta$group=as.factor(meta[,1])
   #message("DAWG")
+  
+  # assumes that the VCF encodes genotype as 0,1,2
+  # neke's data is encoded 0|0, 0|1, 1|1
+  genotypes <- as.data.frame(t(VCF))
+  names(genotypes)[1] <- "geno"
+  geno <- genotypes$geno
+  
+  geno_fix <- case_when(
+    geno == 0 ~ 0,
+    geno == 1 ~ 1,
+    geno == 2 ~ 2,
+    grepl("0\\|0|0/0", geno) ~ 0,
+    grepl("0\\|1|1\\|0|0/1|1/0", geno) ~ 1,
+    grepl("1\\|1|1/1", geno) ~ 2
+  )
+  genotypes$geno <- geno_fix
+  
+  
   group_names <- c(0,1,2)
   names(group_names) <- c(
     paste0( VCF_meta$REF, "/", VCF_meta$REF),
@@ -80,8 +97,7 @@ make_sQTL_box_plot <- function(
   # for each sample divide each junction count by the total for that sample
   normalisedCounts <- as.data.frame(sweep(y, 1, rowSums(y), "/"))
   #message("HELLO BOY")
-  genotypes <- as.data.frame(t(VCF))
-  names(genotypes)[1] <- "geno"
+
   #message("WHEEWWWW LADDDY")
   normalisedCounts$genotypeCode <- genotypes$geno[ match( row.names(normalisedCounts), row.names(genotypes))]
   normalisedCounts <- normalisedCounts[ complete.cases(normalisedCounts),]
@@ -90,6 +106,10 @@ make_sQTL_box_plot <- function(
 
   print(head(normalisedCounts))
   #message("GREAT TO MEET YOU")
+  
+  if( !junction_to_plot %in% colnames(normalisedCounts)){
+    junction_to_plot <- paste0("chr", junction_to_plot)
+  }
 
   toPlot <- dplyr::select( normalisedCounts,
                     junction = junction_to_plot,
@@ -110,7 +130,7 @@ make_sQTL_box_plot <- function(
   #message("STILL HERE BOY")
   plot <- ggplot( data = toPlot, aes(x = geno, y = junction, group = geno ) ) +
     geom_boxplot(outlier.colour = NA, fill = "orange") +
-    geom_quasirandom(size = 0.8) + #coord_flip() +
+    ggbeeswarm::geom_quasirandom(size = 0.8) + #coord_flip() +
     theme_classic() +
     theme(axis.title.y = element_text( angle = 90 ) ) +
     ylab("contribution to cluster") +

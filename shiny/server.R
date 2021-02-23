@@ -68,7 +68,6 @@ defaultValue <- 1
 # make_sQTL_box_plot(
 #     cluster_to_plot =  row.names(resultsToPlot)[sel],
 #     junction_to_plot = junction_to_plot,
-#     all_junctions = all_junctions,
 #     main_title = NA,
 #     vcf = vcf,
 #     vcf_meta = vcf_meta,
@@ -209,7 +208,6 @@ shinyServer(function(input, output) {
       make_sQTL_box_plot(
         cluster_to_plot =  mydata()$clusterID,
         junction_to_plot = mydata()$junction,
-        all_junctions = all_junctions,
         main_title = NA,
         vcf = vcf,
         vcf_meta = vcf_meta,

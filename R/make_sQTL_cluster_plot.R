@@ -17,12 +17,12 @@
 make_sQTL_cluster_plot <- function(
   cluster_to_plot,
   main_title = NA,
-  exons_table = NULL,
-  vcf = NULL,
-  vcf_meta = NULL,
+  exons_table = exons_table,
+  vcf = vcf,
+  vcf_meta = vcf_meta,
   cluster_ids = NULL,
   counts = NULL,
-  introns = NULL,
+  introns = annotatedClusters,
   snp_pos=NA,
   sigJunction=NA,
   snp = snp ){
@@ -30,7 +30,7 @@ make_sQTL_cluster_plot <- function(
   if( is.null(cluster_to_plot)){
     print("no cluster selected!")
   }
-
+  message(" * sQTLviz: cluster plotting")
   stopifnot( snp %in% vcf_meta$SNP )
 
   # subset VCF and get groups
@@ -41,7 +41,21 @@ make_sQTL_cluster_plot <- function(
   VCF_meta <- vcf_meta[vcfIndex,]
   meta <- as.data.frame(t(VCF))
   meta$group=as.factor(meta[,1])
+  geno <- meta$group
+  geno_fix <- case_when(
+    geno == 0 ~ 0,
+    geno == 1 ~ 1,
+    geno == 2 ~ 2,
+    grepl("0\\|0|0/0", geno) ~ 0,
+    grepl("0\\|1|1\\|0|0/1|1/0", geno) ~ 1,
+    grepl("1\\|1|1/1", geno) ~ 2
+  )
+  meta$group <- geno_fix
+  
   group_names <- c(0,1,2)
+  
+  stopifnot(all(meta$group %in% group_names))
+  
   names(group_names) <- c(
       paste0( VCF_meta$REF, "/", VCF_meta$REF),
       paste0( VCF_meta$REF, "/", VCF_meta$ALT),
@@ -89,10 +103,24 @@ make_sQTL_cluster_plot <- function(
   #intron_meta$rank <- ranks[match(intron_meta$dPSI, absPSI)]
 
   # make sure intron_meta has "chr" in front of chromosome name so it plays nice with the exon table
-  if( all( ! grepl("chr", intron_meta$chr))){
-    intron_meta$chr <- paste0("chr", as.character(intron_meta$chr))
+  # if exons table doesn't use "chr" then don't alter
+  # if exons_table uses chr then
+  if( all( grepl("chr", exons_table$chr) ) ){
+    # if intron meta doesn't use chr then add chr
+    if( all(!grepl("chr", intron_meta$chr) )){
+      intron_meta$chr <- paste0("chr", as.character(intron_meta$chr))
+    }
+  }else{
+    # if intron_meta does use chr but exon table doesn't
+    if( all(grepl("chr", intron_meta$chr) )){
+      exons_table$chr <- paste0("chr", as.character(exons_table$chr))
+    }
   }
 
+  print("HELLO JACK")
+  print(intron_meta)
+  print(head(exons_table))
+  
   #print(intron_meta)
 
   new_theme_empty <- theme_bw(base_size = 15 )
@@ -160,9 +188,6 @@ make_sQTL_cluster_plot <- function(
   # sweep is dividing each entry in each row by the sum of all entries in that row and then apply is finding the mean value of each column
   summary_func <- function(a) apply( sweep(a,1,rowSums(a),"/"),2, function(g) mean(g, na.rm=T) )
 
-  if( !is.na(sigJunction)){
-    sig.junction <- str_split_fixed(sigJunction,":",4)[1,]
-  }
 
   plots <- foreach (tis=groups) %do% {
     # print(y[tiss=x,,drop=F])
@@ -186,7 +211,7 @@ make_sQTL_cluster_plot <- function(
     # for each junction
     allEdges=do.call(rbind,foreach (i=1:nrow(intron_meta)) %do% {
       #allEdges=do.call(rbind,foreach (i=1:2) %do% {
-      if (i%%2==1) return(NULL)  # only care about the even numbered junctions?
+      if (i%%2==1){ return(NULL) }  # only care about the even numbered junctions?
       #if (intron_meta$counts[i]==0) return(NULL)
       start=coords[ as.character(intron_meta$start[i]) ]
       end=coords[ as.character(intron_meta$end[i]) ]
@@ -219,8 +244,12 @@ make_sQTL_cluster_plot <- function(
       #edge$SIZE <- as.factor(.bincode(intron_meta$prop[i]+0.1, breaks=seq(0,100,1)/100, include.lowest=TRUE))
       edge$verdict <- ifelse( intron_meta$verdict[i] == "annotated", yes = "annotated", no ="cryptic")
       # if matches sigJunction
-      edge$embolden <- paste(edge$startv, edge$endv) == paste(sig.junction[2], sig.junction[3])
-
+      if( !is.na(sigJunction)){
+        sig.junction <- str_split_fixed(sigJunction,":",4)[1,]
+        edge$embolden <- paste(edge$startv, edge$endv) == paste(sig.junction[2], sig.junction[3])
+      }else{
+        edge$embolden <- FALSE
+      }
 
       # if proportion = 0 then remove junction
       edge <- edge[ edge$label > min_proportion | edge$embolden, ]
@@ -229,7 +258,8 @@ make_sQTL_cluster_plot <- function(
     })
 
     allEdgesP=do.call(rbind,foreach (i=1:nrow(intron_meta)) %do% {
-      if (i%%2==0) return(NULL)  # just the odd numbered junctions
+      if (i%%2==0){ return(NULL) }
+      #if (i%%2==0) return(NULL)  # just the odd numbered junctions
       #if (intron_meta$counts[i]==0) return(NULL)
       start=coords[ as.character(intron_meta$start[i]) ]
       end=coords[ as.character(intron_meta$end[i]) ]
@@ -259,8 +289,11 @@ make_sQTL_cluster_plot <- function(
       #edge$SIZE <- as.factor(.bincode(intron_meta$prop[i], breaks=seq(0,100,1)/100, include.lowest=TRUE))
       edge$SIZE <- intron_meta$prop[i]+1
       edge$verdict <- ifelse( intron_meta$verdict[i] == "annotated", yes = "annotated", no ="cryptic")
-      edge$embolden <- paste(edge$startv, edge$endv) == paste(sig.junction[2], sig.junction[3])
-
+      if( !is.na(sigJunction)){
+        edge$embolden <- paste(edge$startv, edge$endv) == paste(sig.junction[2], sig.junction[3])
+      }else{
+        edge$embolden <- FALSE
+      }
       edge <- edge[ edge$label > min_proportion | edge$embolden, ]
       edge
     })
@@ -446,7 +479,7 @@ make_sQTL_cluster_plot <- function(
         gene_strand <- NULL
       }else{
         # assign strand arrows based on lengths of intron
-        exon_intervals <- Intervals( matrix(data = c(exon_df$x, exon_df$xend), ncol = 2) )
+        exon_intervals <- intervals::Intervals( matrix(data = c(exon_df$x, exon_df$xend), ncol = 2) )
         #exon_intervals <- intervals::interval_union( exon_intervals )
         intron_intervals <- intervals::interval_complement( exon_intervals )
         intron_intervals <- intron_intervals[ 2:(nrow(intron_intervals)-1),]
@@ -532,8 +565,9 @@ make_sQTL_cluster_plot <- function(
                                                              legend.text = element_text(size = legendTextSize)
                                                              )
 
-    gridExtra::grid.arrange( plots[[1]], plots[[2]], ncol =1)
+    final_plot <- gridExtra::grid.arrange( plots[[1]], plots[[2]], ncol =1)
   }else{
+      print( " * adding SNP position info!")
       # sQTL specific options
 
       SNP_df <- data.frame( x=snp_coord,
@@ -615,14 +649,16 @@ make_sQTL_cluster_plot <- function(
               )
 
       # arranging
+      print( paste0(" * combining ", length(plots), " plots together!"))
+      
       if( length( plots ) == 2){
-        gridExtra::grid.arrange( plots[[1]], plots[[2]], ncol =1)
+        final_plot <- gridExtra::grid.arrange( plots[[1]], plots[[2]], ncol =1)
       }
       if( length( plots ) == 3){
-        gridExtra::grid.arrange( plots[[1]], plots[[2]], plots[[3]], ncol =1)
+        final_plot <- gridExtra::grid.arrange( plots[[1]], plots[[2]], plots[[3]], ncol =1)
       }
   }
-
+  return(final_plot)
   }
 
 
